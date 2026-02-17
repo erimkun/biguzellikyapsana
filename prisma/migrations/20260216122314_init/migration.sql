@@ -1,18 +1,22 @@
 -- CreateTable
 CREATE TABLE "Booking" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "ownerName" TEXT NOT NULL,
-    "startTime" DATETIME NOT NULL,
-    "endTime" DATETIME NOT NULL,
+    "startTime" TIMESTAMP(3) NOT NULL,
+    "endTime" TIMESTAMP(3) NOT NULL,
     "notes" TEXT,
     "status" TEXT NOT NULL DEFAULT 'ACTIVE',
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Booking_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Room" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "capacity" INTEGER NOT NULL
+    "capacity" INTEGER NOT NULL,
+
+    CONSTRAINT "Room_pkey" PRIMARY KEY ("id")
 );
