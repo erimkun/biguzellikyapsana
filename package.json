@@ -10,7 +10,8 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.4.0",
+    "@neondatabase/serverless": "^1.0.2",
+    "@prisma/adapter-neon": "^7.4.0",
     "@prisma/client": "^7.4.0",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
@@ -20,7 +21,6 @@
     "framer-motion": "^12.34.0",
     "gsap": "^3.14.2",
     "next": "16.1.6",
-    "pg": "^8.18.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "tailwind-merge": "^3.4.1",

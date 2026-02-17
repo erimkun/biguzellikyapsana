@@ -1,5 +1,5 @@
 import { PrismaClient } from '@/generated/prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaNeon } from '@prisma/adapter-neon';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -46,7 +46,7 @@ const prismaClientSingleton = () => {
         throw new Error('DATABASE_URL/POSTGRES_PRISMA_URL/POSTGRES_URL is not set');
     }
 
-    const adapter = new PrismaPg({ connectionString });
+    const adapter = new PrismaNeon({ connectionString });
     return new PrismaClient({ adapter });
 };
 
