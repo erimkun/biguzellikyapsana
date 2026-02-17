@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useStore } from '@/lib/store';
 import BookingModal from '@/components/ui/BookingModal';
 import Calendar3DBook from '@/components/ui/Calendar3DBook';
@@ -45,8 +46,15 @@ export default function Home() {
                 <header className="w-full max-w-2xl mb-8 animate-fadeIn">
                     <div className="clay-card p-5 sm:p-6 flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-blue-300 to-purple-300 flex items-center justify-center shadow-inner shrink-0">
-                                <span className="text-xl">📅</span>
+                            <div className="w-12 h-12 rounded-2xl bg-gray-800/90 flex items-center justify-center shadow-inner shrink-0 p-2">
+                                <Image
+                                    src="/KentasLogoWhite.png"
+                                    alt="Kentaş Logo"
+                                    width={32}
+                                    height={32}
+                                    className="object-contain"
+                                    priority
+                                />
                             </div>
                             <div>
                                 <h1 className="text-lg sm:text-xl font-bold text-gray-800">

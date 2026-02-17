@@ -8,6 +8,11 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Kentaş Toplantı Odası",
   description: "Tactile 3D Meeting Room Booking Experience",
+  icons: {
+    icon: '/KentasLogoWhite.png',
+    shortcut: '/KentasLogoWhite.png',
+    apple: '/KentasLogoWhite.png',
+  },
 };
 
 export default function RootLayout({
