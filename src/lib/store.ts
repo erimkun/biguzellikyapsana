@@ -5,11 +5,15 @@ interface AppState {
     view: 'month' | 'day';
     isBookingModalOpen: boolean;
     selectedTimeSlot: string | null;
+    isCalendarVisible: boolean;
+    clearDrawingTrigger: number;
 
     setSelectedDate: (date: Date) => void;
     setView: (view: 'month' | 'day') => void;
     setBookingModalOpen: (open: boolean) => void;
     setSelectedTimeSlot: (time: string | null) => void;
+    setCalendarVisible: (visible: boolean) => void;
+    triggerClearDrawing: () => void;
 
     goToNextMonth: () => void;
     goToPrevMonth: () => void;
@@ -22,6 +26,8 @@ export const useStore = create<AppState>((set, get) => ({
     view: 'month',
     isBookingModalOpen: false,
     selectedTimeSlot: null,
+    isCalendarVisible: true,
+    clearDrawingTrigger: 0,
 
     setSelectedDate: (date) => set({ selectedDate: date }),
 
@@ -37,6 +43,8 @@ export const useStore = create<AppState>((set, get) => ({
         selectedTimeSlot: open ? get().selectedTimeSlot : null,
     }),
     setSelectedTimeSlot: (time) => set({ selectedTimeSlot: time }),
+    setCalendarVisible: (visible) => set({ isCalendarVisible: visible }),
+    triggerClearDrawing: () => set((state) => ({ clearDrawingTrigger: state.clearDrawingTrigger + 1 })),
 
     goToNextMonth: () => set((state) => {
         const d = new Date(state.selectedDate);
