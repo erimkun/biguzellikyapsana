@@ -6,6 +6,7 @@ import BookingModal from '@/components/ui/BookingModal';
 import Calendar3DBook from '@/components/ui/Calendar3DBook';
 import ParticleOverlay from '@/components/canvas/ParticleOverlay';
 import Scene from '@/components/canvas/Scene';
+import SuikaGame from '@/components/game/SuikaGame';
 
 export default function Home() {
     const { isBookingModalOpen, goToToday, isCalendarVisible, setCalendarVisible, triggerClearDrawing } = useStore();
@@ -78,15 +79,6 @@ export default function Home() {
 
                 {/* Toggle Controls */}
                 <div className="w-full max-w-2xl flex justify-between items-center px-2 mb-2 animate-fadeIn transition-all pointer-events-auto">
-                    {!isCalendarVisible && (
-                        <button
-                            onClick={triggerClearDrawing}
-                            className="clay-button clay-button-ghost text-sm flex items-center gap-2"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                            Çizimi Temizle
-                        </button>
-                    )}
                     <button
                         onClick={() => setCalendarVisible(!isCalendarVisible)}
                         className={`clay-button text-sm flex items-center gap-2 z-50 ${!isCalendarVisible ? 'bg-indigo-500/10 border-indigo-200 text-indigo-700 ml-auto' : 'clay-button-ghost ml-auto'}`}
@@ -106,17 +98,20 @@ export default function Home() {
                 </div>
 
                 {/* 3D Calendar */}
-                <div className={`w-full max-w-2xl flex-1 pt-4 transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform origin-top pointer-events-auto ${isCalendarVisible ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-8 pointer-events-none'}`}>
+                <div className={`w-full max-w-2xl flex-1 pt-4 transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform origin-top pointer-events-auto ${isCalendarVisible ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 absolute -z-50 scale-95 translate-y-8 pointer-events-none'}`}>
                     <Calendar3DBook />
                 </div>
-
-                {/* Footer */}
-                <footer className="w-full max-w-2xl mt-8 mb-4 text-center animate-fadeIn">
-                    <p className="text-xs text-gray-400">
-                        Çalışma saatleri: 08:30 – 17:00 • Kentaş Meeting Room
-                    </p>
-                </footer>
             </main>
+
+            {/* Footer */}
+            <footer className="w-full max-w-2xl mt-8 mb-4 text-center animate-fadeIn">
+                <p className="text-xs text-gray-400">
+                    Çalışma saatleri: 08:30 – 17:00 • Kentaş Meeting Room
+                </p>
+            </footer>
+
+            {/* Suika Game Layer */}
+            {!isCalendarVisible && <SuikaGame isVisible={!isCalendarVisible} />}
 
             {isBookingModalOpen && <BookingModal />}
         </>
