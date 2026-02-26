@@ -29,6 +29,20 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Environment variables
+
+The app relies on a `DATABASE_URL` for Prisma. The default in `.env.example` is
+configured for a PostgreSQL provider (Neon DB). To override this you can create
+`.env.local` or use `.env.vercel` when deploying. A commented SQLite line is
+included in the example so you can toggle to a file-based database during
+development:
+
+```dotenv
+# DATABASE_URL="file:./dev.db"
+```
+
+Switch by commenting/uncommenting the appropriate line and re-running `npx prisma migrate`.
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
