@@ -24,6 +24,7 @@ export async function GET(request: Request) {
 
         const bookings = await prisma.booking.findMany({
             where,
+            include: { room: true },
             orderBy: { startTime: 'asc' },
         });
         return NextResponse.json(bookings);
@@ -36,10 +37,10 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { title, ownerName, startTime, endTime, notes } = body;
+        const { title, ownerName, startTime, endTime, notes, roomId } = body;
 
         // Validate required fields
-        if (!title || !ownerName || !startTime || !endTime) {
+        if (!title || !ownerName || !startTime || !endTime || !roomId) {
             return NextResponse.json({ error: 'Tüm zorunlu alanlar doldurulmalıdır' }, { status: 400 });
         }
 
@@ -58,6 +59,7 @@ export async function POST(request: Request) {
         const overlap = await prisma.booking.findFirst({
             where: {
                 status: 'ACTIVE',
+                roomId: Number(roomId),
                 startTime: { lt: endDt },
                 endTime: { gt: startDt },
             },
@@ -75,7 +77,9 @@ export async function POST(request: Request) {
                 endTime: endDt,
                 notes: notes || null,
                 status: 'ACTIVE',
+                roomId: Number(roomId),
             },
+            include: { room: true },
         });
 
         return NextResponse.json(booking);

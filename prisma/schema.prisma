@@ -6,9 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DATABASE_URL_UNPOOLED")
+  provider  = "sqlite"
+  url       = "file:./dev.db"
 }
 
 model Booking {
@@ -20,10 +19,21 @@ model Booking {
   notes     String?
   status    String   @default("ACTIVE") // ACTIVE, CANCELLED
   createdAt DateTime @default(now())
+  roomId    Int
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
 }
 
 model Room {
-  id       Int    @id @default(autoincrement())
+  id       Int       @id @default(autoincrement())
   name     String
   capacity Int
+  color    String?
+  bookings Booking[]
+}
+
+model Leaderboard {
+  id        Int      @id @default(autoincrement())
+  name      String
+  score     Int
+  createdAt DateTime @default(now())
 }

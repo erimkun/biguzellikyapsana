@@ -14,16 +14,42 @@ export default function SuikaGame({ isVisible }: SuikaGameProps) {
     const renderRef = useRef<Matter.Render | null>(null);
     const [score, setScore] = useState(0);
     const [nextBallLevel, setNextBallLevel] = useState<number>(1);
+    const [leaderboard, setLeaderboard] = useState<{ id: number; name: string; score: number }[]>([]);
+    const [playerName, setPlayerName] = useState('');
+    const [isSaving, setIsSaving] = useState(false);
+    const [hasSaved, setHasSaved] = useState(false);
+    const [shareMessage, setShareMessage] = useState('');
+
     const lastDropTime = useRef<number>(0);
     const runnerRef = useRef<Matter.Runner | null>(null);
 
-    // Determines the level of the next ball (weighted towards 1 and 2)
-    const getNextBallLevel = () => {
+    // Determines the level of the next ball based on current score
+    const getNextBallLevel = useCallback(() => {
         const rand = Math.random();
-        if (rand < 0.6) return 1;
-        if (rand < 0.9) return 2;
-        return 3;
-    };
+
+        // As score increases, unlock higher level balls
+        if (score > 1000) {
+            if (rand < 0.3) return 1;
+            if (rand < 0.6) return 2;
+            if (rand < 0.8) return 3;
+            if (rand < 0.95) return 4;
+            return 5;
+        } else if (score > 500) {
+            if (rand < 0.4) return 1;
+            if (rand < 0.7) return 2;
+            if (rand < 0.9) return 3;
+            return 4;
+        } else if (score > 200) {
+            if (rand < 0.5) return 1;
+            if (rand < 0.8) return 2;
+            return 3;
+        } else {
+            // Default starting difficulty
+            if (rand < 0.6) return 1;
+            if (rand < 0.9) return 2;
+            return 3;
+        }
+    }, [score]);
 
     // Creates a physical ball body
     const createBall = useCallback((x: number, y: number, level: number, isStatic = false) => {
@@ -206,6 +232,7 @@ export default function SuikaGame({ isVisible }: SuikaGameProps) {
         Matter.Runner.run(runner, engine);
 
         setNextBallLevel(getNextBallLevel());
+        fetchLeaderboard();
 
         return () => {
             // Cleanup on unmount
@@ -215,7 +242,52 @@ export default function SuikaGame({ isVisible }: SuikaGameProps) {
             render.canvas.remove();
             render.textures = {};
         };
-    }, [createBall]);
+    }, [createBall, getNextBallLevel]);
+
+    const fetchLeaderboard = async () => {
+        try {
+            const res = await fetch('/api/leaderboard');
+            if (res.ok) {
+                const data = await res.json();
+                setLeaderboard(data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch leaderboard:', error);
+        }
+    };
+
+    const handleSaveScore = async () => {
+        if (!playerName.trim() || score === 0 || isSaving) return;
+
+        setIsSaving(true);
+        try {
+            const res = await fetch('/api/leaderboard', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: playerName, score }),
+            });
+
+            if (res.ok) {
+                setHasSaved(true);
+                fetchLeaderboard();
+            }
+        } catch (error) {
+            console.error('Failed to save score:', error);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleShareScore = async () => {
+        const textToShare = `Kentaş Suika'da ${score} puan yaptım! Sen de oyna: ${typeof window !== 'undefined' ? window.location.origin : ''}`;
+        try {
+            await navigator.clipboard.writeText(textToShare);
+            setShareMessage('Panoya kopyalandı!');
+            setTimeout(() => setShareMessage(''), 3000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+    };
 
     const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
         if (!engineRef.current || !renderRef.current) return;
@@ -256,22 +328,92 @@ export default function SuikaGame({ isVisible }: SuikaGameProps) {
                 />
 
                 {/* Score and Next Ball HUD */}
-                <div className="absolute -top-16 left-0 flex items-center gap-6 bg-white/10 backdrop-blur-md rounded-2xl px-6 py-3 border border-white/20 shadow-xl w-full z-20">
-                    <div className="flex flex-col">
-                        <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">Score</span>
-                        <span className="text-2xl font-bold text-gray-800">{score}</span>
+                <div className="absolute -top-16 left-0 flex items-center justify-between bg-white/10 backdrop-blur-md rounded-2xl px-6 py-3 border border-white/20 shadow-xl w-full z-20">
+                    <div className="flex items-center gap-6">
+                        <div className="flex flex-col">
+                            <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">Score</span>
+                            <span className="text-2xl font-bold text-gray-800">{score}</span>
+                        </div>
+                        <div className="h-10 w-px bg-white/20" />
+                        <div className="flex items-center gap-3">
+                            <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">Next:</span>
+                            <div
+                                className="w-10 h-10 rounded-full shadow-inner bg-no-repeat bg-center border border-white/20"
+                                style={{
+                                    backgroundImage: `url(${BALL_TYPES[nextBallLevel - 1]?.texture})`,
+                                    backgroundColor: BALL_TYPES[nextBallLevel - 1]?.color,
+                                    backgroundSize: '75%'
+                                }}
+                            />
+                        </div>
                     </div>
-                    <div className="h-10 w-px bg-white/20" />
-                    <div className="flex items-center gap-3">
-                        <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">Next:</span>
-                        <div
-                            className="w-10 h-10 rounded-full shadow-inner bg-no-repeat bg-center border border-white/20"
-                            style={{
-                                backgroundImage: `url(${BALL_TYPES[nextBallLevel - 1]?.texture})`,
-                                backgroundColor: BALL_TYPES[nextBallLevel - 1]?.color,
-                                backgroundSize: '75%'
-                            }}
-                        />
+
+                    {/* Share Button (Left of Leaderboard) */}
+                    <div className="flex flex-col items-center">
+                        <button
+                            onClick={handleShareScore}
+                            className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1.5 px-4 rounded-xl transition-colors shadow-md flex items-center gap-2"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                            Puanını Paylaş
+                        </button>
+                        {shareMessage && <span className="text-xs text-green-600 font-medium absolute -bottom-5">{shareMessage}</span>}
+                    </div>
+                </div>
+
+                {/* Vertical Leaderboard Panel */}
+                <div className="absolute top-0 -right-64 w-60 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl z-20 overflow-hidden flex flex-col h-full rounded-l-none border-l-0">
+                    <div className="bg-gradient-to-r from-blue-600/80 to-indigo-600/80 p-4 shrink-0">
+                        <h3 className="text-white font-bold text-lg flex items-center gap-2">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            Top 5 Leaderboard
+                        </h3>
+                    </div>
+
+                    <div className="p-4 flex-1 overflow-y-auto">
+                        <div className="flex flex-col gap-3">
+                            {leaderboard.length === 0 ? (
+                                <p className="text-sm text-gray-500 text-center py-4">Henüz puan yok</p>
+                            ) : (
+                                leaderboard.map((entry, index) => (
+                                    <div key={entry.id} className="flex items-center justify-between bg-white/40 p-2 rounded-lg border border-white/50">
+                                        <div className="flex items-center gap-2">
+                                            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${index === 0 ? 'bg-yellow-400 text-yellow-900' : index === 1 ? 'bg-gray-300 text-gray-800' : index === 2 ? 'bg-amber-600 text-amber-100' : 'bg-white/50 text-gray-600'}`}>
+                                                {index + 1}
+                                            </span>
+                                            <span className="text-sm font-semibold text-gray-800 truncate max-w-[90px]" title={entry.name}>
+                                                {entry.name}
+                                            </span>
+                                        </div>
+                                        <span className="text-sm font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md">
+                                            {entry.score}
+                                        </span>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="p-4 bg-white/20 border-t border-white/30 shrink-0">
+                        <div className="flex flex-col gap-2">
+                            <input
+                                type="text"
+                                placeholder="İsminiz..."
+                                value={playerName}
+                                onChange={(e) => setPlayerName(e.target.value)}
+                                disabled={hasSaved || isSaving}
+                                className="w-full px-3 py-2 text-sm rounded-lg bg-white/60 border border-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                                maxLength={15}
+                            />
+                            <button
+                                onClick={handleSaveScore}
+                                disabled={!playerName.trim() || score === 0 || isSaving || hasSaved}
+                                className={`w-full py-2 text-sm font-bold rounded-lg transition-all ${hasSaved ? 'bg-green-500 text-white' : 'bg-gray-800 hover:bg-gray-900 text-white'
+                                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            >
+                                {isSaving ? 'Kaydediliyor...' : hasSaved ? 'Kaydedildi!' : 'Puanı Kaydet'}
+                            </button>
+                        </div>
                     </div>
                 </div>
 

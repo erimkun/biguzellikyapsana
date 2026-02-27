@@ -16,6 +16,7 @@ export default function BookingModal() {
         duration: '60',
         startTime: selectedTimeSlot || '09:00',
         notes: '',
+        roomId: 1,
     });
 
     useEffect(() => {
@@ -71,6 +72,7 @@ export default function BookingModal() {
                 startTime: start.toISOString(),
                 endTime: end.toISOString(),
                 notes: formData.notes || undefined,
+                roomId: formData.roomId,
             });
             setSuccess(true);
             setTimeout(() => setBookingModalOpen(false), 1500);
@@ -160,6 +162,23 @@ export default function BookingModal() {
                                         setFormData({ ...formData, ownerName: e.target.value })
                                     }
                                 />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-600 ml-1 mb-1.5">
+                                    Toplantı Odası *
+                                </label>
+                                <select
+                                    className="clay-input"
+                                    value={formData.roomId}
+                                    onChange={(e) =>
+                                        setFormData({ ...formData, roomId: Number(e.target.value) })
+                                    }
+                                >
+                                    <option value={1}>Toplantı Odası 1</option>
+                                    <option value={2}>Toplantı Odası (Zemin)</option>
+                                    <option value={3}>Toplantı Odası (Yönetim)</option>
+                                </select>
                             </div>
 
                             <div className="flex gap-3">

@@ -149,9 +149,19 @@ body {
   gap: 4px;
 }
 
-.pill-active {
+.pill-active, .pill-blue {
   background: rgba(137, 207, 240, 0.2);
   color: #3a8fc2;
+}
+
+.pill-red {
+  background: rgba(250, 128, 114, 0.2);
+  color: #c25a4e;
+}
+
+.pill-yellow {
+  background: rgba(240, 230, 140, 0.4);
+  color: #b8860b;
 }
 
 .pill-cancelled {
@@ -225,13 +235,36 @@ body {
 }
 
 .time-slot.occupied {
-  background: rgba(137, 207, 240, 0.12);
-  border-color: rgba(137, 207, 240, 0.25);
   cursor: pointer;
 }
 
-.time-slot.occupied:hover {
+.time-slot.occupied.time-slot-blue {
+  background: rgba(137, 207, 240, 0.12);
+  border-color: rgba(137, 207, 240, 0.25);
+}
+
+.time-slot.occupied.time-slot-red {
+  background: rgba(250, 128, 114, 0.12);
+  border-color: rgba(250, 128, 114, 0.25);
+}
+
+.time-slot.occupied.time-slot-yellow {
+  background: rgba(240, 230, 140, 0.2);
+  border-color: rgba(240, 230, 140, 0.4);
+}
+
+.time-slot.occupied.time-slot-blue:hover {
   background: rgba(137, 207, 240, 0.2);
+  transform: translateX(4px);
+}
+
+.time-slot.occupied.time-slot-red:hover {
+  background: rgba(250, 128, 114, 0.2);
+  transform: translateX(4px);
+}
+
+.time-slot.occupied.time-slot-yellow:hover {
+  background: rgba(240, 230, 140, 0.3);
   transform: translateX(4px);
 }
 

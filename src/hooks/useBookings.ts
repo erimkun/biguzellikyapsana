@@ -1,5 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
+export interface Room {
+    id: number;
+    name: string;
+    capacity: number;
+    color?: string;
+}
+
 export interface Booking {
     id: number;
     title: string;
@@ -9,6 +16,8 @@ export interface Booking {
     notes?: string;
     status: 'ACTIVE' | 'CANCELLED';
     createdAt: string;
+    roomId: number;
+    room?: Room;
 }
 
 export function useBookings(date?: string) {
@@ -42,7 +51,7 @@ export function useMonthBookings(year: number, month: number) {
 export function useCreateBooking() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (newBooking: Omit<Booking, 'id' | 'status' | 'createdAt'>) => {
+        mutationFn: async (newBooking: Omit<Booking, 'id' | 'status' | 'createdAt' | 'room'>) => {
             const res = await fetch('/api/bookings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
