@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "postinstall": "prisma generate",
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seedRooms.ts",
-    "build": "prisma generate && prisma db push && npm run seed && next build",
+    "seed": "ts-node prisma/seedRooms.ts",
+    "build": "prisma generate && (prisma db push || true) && npm run seed && prisma db push && next build",
     "start": "next start",
     "lint": "eslint"
   },
