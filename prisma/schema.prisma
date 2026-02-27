@@ -20,8 +20,8 @@ model Booking {
   notes     String?
   status    String   @default("ACTIVE") // ACTIVE, CANCELLED
   createdAt DateTime @default(now())
-  roomId    Int      @default(1)
-  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  roomId    Int?     @default(1)
+  room      Room?    @relation(fields: [roomId], references: [id], onDelete: Cascade)
 }
 
 model Room {
