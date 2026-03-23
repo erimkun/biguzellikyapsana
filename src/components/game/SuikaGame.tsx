@@ -24,22 +24,22 @@ export default function SuikaGame({ isVisible }: SuikaGameProps) {
     const runnerRef = useRef<Matter.Runner | null>(null);
 
     // Determines the level of the next ball based on current score
-    const getNextBallLevel = useCallback(() => {
+    const getNextBallLevel = useCallback((currentScore: number) => {
         const rand = Math.random();
 
         // As score increases, unlock higher level balls
-        if (score > 1000) {
+        if (currentScore > 1000) {
             if (rand < 0.3) return 1;
             if (rand < 0.6) return 2;
             if (rand < 0.8) return 3;
             if (rand < 0.95) return 4;
             return 5;
-        } else if (score > 500) {
+        } else if (currentScore > 500) {
             if (rand < 0.4) return 1;
             if (rand < 0.7) return 2;
             if (rand < 0.9) return 3;
             return 4;
-        } else if (score > 200) {
+        } else if (currentScore > 200) {
             if (rand < 0.5) return 1;
             if (rand < 0.8) return 2;
             return 3;
@@ -49,7 +49,7 @@ export default function SuikaGame({ isVisible }: SuikaGameProps) {
             if (rand < 0.9) return 2;
             return 3;
         }
-    }, [score]);
+    }, []);
 
     // Creates a physical ball body
     const createBall = useCallback((x: number, y: number, level: number, isStatic = false) => {
@@ -233,7 +233,7 @@ export default function SuikaGame({ isVisible }: SuikaGameProps) {
         runnerRef.current = runner;
         Matter.Runner.run(runner, engine);
 
-        setNextBallLevel(getNextBallLevel());
+        setNextBallLevel(getNextBallLevel(score));
         fetchLeaderboard();
 
         return () => {
@@ -312,9 +312,9 @@ export default function SuikaGame({ isVisible }: SuikaGameProps) {
         if (newBall) {
             Matter.Composite.add(engineRef.current.world, newBall);
             lastDropTime.current = now;
-            setNextBallLevel(getNextBallLevel());
+            setNextBallLevel(getNextBallLevel(score));
         }
-    }, [nextBallLevel, createBall]);
+    }, [nextBallLevel, createBall, getNextBallLevel, score]);
 
 
     return (
