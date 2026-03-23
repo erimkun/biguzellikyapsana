@@ -151,7 +151,9 @@ export default function SuikaGame({ isVisible }: SuikaGameProps) {
                                 // Add score
                                 setScore((s) => s + BALL_TYPES[nextLevel - 1].score);
 
-                                Matter.Composite.remove(engine.world, [bodyA, bodyB]);
+                                // Remove the two merged bodies individually to avoid accidental world-wide removal
+                                Matter.Composite.remove(engine.world, bodyA);
+                                Matter.Composite.remove(engine.world, bodyB);
                                 Matter.Composite.add(engine.world, newBall);
                             }
                         }
